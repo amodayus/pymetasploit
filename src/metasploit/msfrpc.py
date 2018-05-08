@@ -1328,8 +1328,10 @@ class MsfModule(object):
         self.modulename = mname
         self.rpc = rpc
         self._info = rpc.call(MsfRpcMethod.ModuleInfo, mtype, mname)
+	property_attributes = ["advanced", "evasion", "options", "required", "runoptions"]
         for k in self._info:
-            setattr(self, k, self._info.get(k))
+	    if k not in property_attributes:
+	        setattr(self, k, self._info.get(k))
         self._moptions = rpc.call(MsfRpcMethod.ModuleOptions, mtype, mname)
         self._roptions = []
         self._aoptions = []
@@ -1456,10 +1458,10 @@ class MsfModule(object):
                 runopts['DisablePayloadHandler'] = True
             else:
                 if isinstance(payload, PayloadModule):
-                    if payload.modulename not in self.payloads:
-                        raise ValueError(
-                            'Invalid payload (%s) for given target (%d).' % (payload.modulename, self.target)
-                        )
+                    #if payload.modulename not in self.payloads:
+                        #raise ValueError(
+                        #    'Invalid payload (%s) for given target (%d).' % (payload.modulename, self.target)
+                        #)
                     runopts['PAYLOAD'] = payload.modulename
                     for k, v in payload.runoptions.iteritems():
                         if v is None or (isinstance(v, basestring) and not v):
@@ -1469,8 +1471,8 @@ class MsfModule(object):
                             runopts[k] = v
 #                    runopts.update(payload.runoptions)
                 elif isinstance(payload, basestring):
-                    if payload not in self.payloads:
-                        raise ValueError('Invalid payload (%s) for given target (%d).' % (payload, self.target))
+                    #if payload not in self.payloads:
+                        #raise ValueError('Invalid payload (%s) for given target (%d).' % (payload, self.target))
                     runopts['PAYLOAD'] = payload
                 else:
                     raise TypeError("Expected type str or PayloadModule not '%s'" % type(kwargs['payload']).__name__)
